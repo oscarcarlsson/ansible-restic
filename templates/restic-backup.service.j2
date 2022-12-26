@@ -19,6 +19,10 @@ Environment="AWS_ACCESS_KEY_ID={{ restic_aws_access_key_id}}"
 Environment="AWS_SECRET_ACCESS_KEY={{ restic_aws_secret_access_key}}"
 {% endif %}
 
+{% if restic_resetserver_enabled %}
+  Environment="RESTIC_REPOSITORY=rest:http{% if restic_restserver_tls %}s{% endif %}://{% if restic_restserver_user and restic_restserver_password %}{{ restic_restserver_user}}:{{ restic_restserver_password }}@{% endif %}{{ restic_restserver_host }}{% if restic_restserver_port %}:{{ restic_restserver_port }}{% endif %}/{{ restic_repository_name }}"
+{% endif %}
+
 {% if restic_check %}
 ExecStartPre={{ restic_path }} check
 {% endif -%}
