@@ -10,25 +10,49 @@
 - name: Install pigz (to compress db dumps)
   apt:
     name: pigz
+  when: restic_dump_compression_enabled
+
+- name: Check if restic binary exists
+  ansible.builtin.stat:
+    path: "{{ restic_path }}"
+  register: restic_stat
+
+- name: Run version check
+  ansible.builtin.command:
+    cmd: "{{ restic_path }} version"
+  register: restic_installed_version
+  when: restic_stat is defined and restic_stat.stat.exists
+
+- name: Check if installed version is correct
+  ansible.builtin.set_fact:
+    restic_version_correct: |
+      {{ restic_version in restic_installed_version.stdout }}
+  when: restic_stat is defined and restic_stat.stat.exists
 
 - name: Download restic
   ansible.builtin.get_url:
-    url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_linux_amd64.bz2"
-    dest: "/tmp/restic_{{ restic_version }}_linux_amd64.bz2"
+    url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_{{ restic_arch }}.bz2"
+    dest: "/tmp/restic_{{ restic_version }}_{{ restic_arch }}.bz2"
+  when:
+    - (restic_stat is defined and not restic_stat.stat.exists) or (restic_version_correct is defined and not restic_version_correct)
+  register: restic_install_required
 
 - name: Extract restic
-  command: "bzip2 -d /tmp/restic_{{ restic_version }}_linux_amd64.bz2"
+  command: "bzip2 -d /tmp/restic_{{ restic_version }}_{{ restic_arch }}.bz2"
   args:
-    creates: "/tmp/restic_{{ restic_version }}_linux_amd64"
+    creates: "/tmp/restic_{{ restic_version }}_{{ restic_arch }}"
+  when: restic_install_required is defined and restic_install_required.changed
 
 - name: Install restic
   ansible.builtin.copy:
     remote_src: true
-    src: "/tmp/restic_{{ restic_version }}_linux_amd64"
+    src: "/tmp/restic_{{ restic_version }}_{{ restic_arch }}"
     dest: "{{ restic_path }}"
     mode: 0755
+  when: restic_install_required is defined and restic_install_required.changed
 
 - name: Remove downloaded file
   ansible.builtin.file:
-    path: "/tmp/restic_{{ restic_version }}_linux_amd64"
+    path: "/tmp/restic_{{ restic_version }}_{{ restic_arch }}"
     state: absent
+  when: restic_install_required is defined and restic_install_required.changed
