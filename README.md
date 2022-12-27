@@ -2,15 +2,17 @@
 
 This role will setup [Restic](https://restic.net/) backups on a Debian/Ubuntu machine using a systemd service and timer.
 
-It supports S3 backend or SFTP backend and will thus setup the SSH config and SSH private keys (see variables below).
+It supports all restic backends but will help you setup SSH keys if you go the SFTP route. It will optionally also download and install restic from GitHub.
 
 ## Role Variables
 
 ### Restic installation
 
-The role will download and install the restic binary (version `restic_version`) into `restic_path` if the file does not exist.
+The role will download and install the restic binary (version `restic_version`) into `restic_path` if the file does not exist, or if it's not of the right version.
 
 If you want to force the installation, overwrite the binary or update restic, you can run ansible with `--extra-vars restic_install=true`.
+
+If you are using an architecture different from Linux x86, set variable `restic_arch` to match.  This is used as a suffix for downloading restic from [the Github release page](https://github.com/restic/restic/releases).  Defaults to `linux_amd64`.
 
 ### Restic configuration
 
@@ -53,7 +55,16 @@ The SSH configuration will be written in `{{ restic_user_home }}/.ssh/config`.
 - `restic_aws_access_key_id`: `AWS_ACCESS_KEY_ID`
 - `restic_aws_secret_access_key`: `AWS_SECRET_ACCESS_KEY`
 
-### Sytemd service and timer
+### Generic backend configuration
+
+Useful for using the restic restserver as a backend.
+
+- `restic_ssh_enabled`: set to false
+- `restic_repository_name`: set to valid restic syntax.
+
+For example, `rest:https://user:password@example.com/repository` to use HTTP basic authentication with [restic-restserver](https://github.com/restic/rest-server).
+
+### Systemd service and timer
 
 A `restic-backup.service` service will be created with all the parameters defined above. The service is of type `oneshot` and will be triggered periodically with `restic-backup.timer`.
 
