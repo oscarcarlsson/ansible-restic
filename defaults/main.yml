@@ -1,5 +1,6 @@
 ---
 restic_install: false
+restic_force_install: false
 restic_version: 0.14.0
 restic_arch: "linux_amd64"
 

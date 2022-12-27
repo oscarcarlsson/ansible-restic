@@ -10,7 +10,7 @@ It supports all restic backends but will help you setup SSH keys if you go the S
 
 The role will download and install the restic binary (version `restic_version`) into `restic_path` if the file does not exist, or if it's not of the right version.
 
-If you want to force the installation, overwrite the binary or update restic, you can run ansible with `--extra-vars restic_install=true`.
+If you want to force the installation, overwrite the binary or update restic, you can run ansible with `--extra-vars restic_force_install=true`.
 
 If you are using an architecture different from Linux x86, set variable `restic_arch` to match.  This is used as a suffix for downloading restic from [the Github release page](https://github.com/restic/restic/releases).  Defaults to `linux_amd64`.
 

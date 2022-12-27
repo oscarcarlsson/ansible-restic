@@ -29,6 +29,11 @@
       {{ restic_version in restic_installed_version.stdout }}
   when: restic_stat is defined and restic_stat.stat.exists
 
+- name: Force reinstall if needed
+  ansible.builtin.set_fact:
+    restic_version_correct: false
+  when: restic_force_install
+
 - name: Download restic
   ansible.builtin.get_url:
     url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_{{ restic_arch }}.bz2"
