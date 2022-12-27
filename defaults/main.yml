@@ -23,13 +23,5 @@ restic_ssh_host: backup
 restic_ssh_port: 22
 restic_ssh_private_key_path: "/root/.ssh/backup"
 
-restic_restserver_enabled: false
-restic_restserver_user: "user"
-restic_restserver_password: "password"
-restic_restserver_port: "8080"
-restic_restserver_tls: true
-# Will be expanded, given these examples rest:https://user:password@example.com:8080
-restic_restserver_host: "example.com"
-
 restic_systemd_timer_on_calender: "*-*-* 03:00:00"
 restic_systemd_timer_randomized_delay_sec: 0
